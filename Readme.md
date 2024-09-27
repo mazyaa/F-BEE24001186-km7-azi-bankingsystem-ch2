@@ -1,6 +1,10 @@
+
 # Banking System
 
 This project demonstrates a simple banking system using JavaScript classes and custom error handling.
+
+## Flowchart
+![Flowchart_challenge2](https://github.com/user-attachments/assets/5c02437f-ab52-4c3b-a31b-650d18ba10db)
 
 ## Features
 - **Deposit**: tambah dan ke dalam saldo.
