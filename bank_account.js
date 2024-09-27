@@ -1,3 +1,11 @@
+//custom error jika saldo tidak mencukupi
+class InsufficientFundsError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "InsufficientFundsError";
+    }
+}
+
 class BankAccount {
     constructor() {
         this.saldo = 0;
