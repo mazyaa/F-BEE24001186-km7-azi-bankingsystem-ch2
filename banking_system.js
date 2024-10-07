@@ -1,7 +1,5 @@
 const {BankAccount, InsufficientFundsError} = require('./bank_account');
 
-
-
 async function main(){
     const myAccount = new BankAccount();
 
