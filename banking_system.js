@@ -12,6 +12,9 @@ async function main(){
         // -= saldo
         await myAccount.withdraw(10000);
 
+        // Cek saldo setelah withdraw
+        console.log('Saldo saat ini: Rp.', myAccount.getBalance());
+
         
     } catch (err){
         //pake custom error
