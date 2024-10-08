@@ -54,7 +54,6 @@ CALL deposit(1, 100000);
 CALL withdraw(1, 50000);
 
 --SELECT table transaksi
-
 SELECT * FROM transaksi;
 
 
