@@ -53,6 +53,10 @@ CALL deposit(1, 100000);
 --withdraw
 CALL withdraw(1, 50000);
 
+--SELECT table transaksi
+
+SELECT * FROM transaksi;
+
 
 --Delete (hard delete)
 --Delete value in table

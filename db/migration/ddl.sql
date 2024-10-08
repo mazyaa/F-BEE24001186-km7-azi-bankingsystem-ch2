@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS nasabah (
 ALTER TABLE nasabah RENAME COLUMN id TO id_nasabah;
 
 --create indexing from nasabah
-CREATE INDEX idx_Nasabah_nama ON nasabah(nama);
+CREATE INDEX idx_nasabah_nama ON nasabah(nama);
 
 --drop indexing
 DROP INDEX idx_nasabah_nama;
@@ -27,10 +27,10 @@ CREATE TABLE IF NOT EXISTS akun(
 
 
 --create indexing from akun
-CREATE INDEX idx_Akun_saldo ON akun(saldo);
+CREATE INDEX idx_akun_saldo ON akun(saldo);
 
 --drop indexing
-DROP INDEX idx_Akun_nama;
+DROP INDEX idx_akun_saldo;
 
 
 --create table transaksi
@@ -44,17 +44,14 @@ CREATE TABLE IF NOT EXISTS transaksi (
 
 
 --create indexing from transaksi
-CREATE INDEX idx_transaksi_jenis_transaksi ON transaksi(jenis_transaksi);
+CREATE INDEX idx_transaksi_tipe_transaksi ON transaksi(tipe_transaksi);
 
 --drop indexing
-DROP INDEX idx_transaksi_jenis_transaksi;
+DROP INDEX idx_transaksi_tipe_transaksi;
 
 
 --create stored procedure for deposit
-CREATE OR REPLACE PROCEDURE deposit(
-    account_id BIGINT, 
-    amount NUMERIC
-)
+CREATE OR REPLACE PROCEDURE deposit(account_id BIGINT, amount NUMERIC)
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -62,15 +59,16 @@ BEGIN
     SET saldo = saldo + amount
     WHERE id_akun = account_id;
 
+    -- Insert data baru ke tabel transaksi setelah berhasil deposit
+    INSERT INTO transaksi (id_akun, jumlah, tipe_transaksi)
+    VALUES (account_id, amount, 'deposit');
+
     RAISE NOTICE 'Telah melakukan deposit sebanyak: Rp. %', amount;
 END;
 $$;
 
 --create stored procedure for deposit
-CREATE OR REPLACE PROCEDURE withdraw(
-    account_id BIGINT,
-    amount NUMERIC
-)
+CREATE OR REPLACE PROCEDURE withdraw(account_id BIGINT, amount NUMERIC)
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -80,6 +78,10 @@ BEGIN
         UPDATE akun
         SET saldo = saldo - amount
         WHERE id_akun = account_id;
+
+        -- Insert data baru ke tabel transaksi ketika berhasi wd
+        INSERT INTO transaksi (id_akun, jumlah, tipe_transaksi)
+        VALUES (account_id, amount, 'withdraw');
 
         RAISE NOTICE 'Telah melakukan penarikan sebanyak: Rp. %', amount;
     END IF;
