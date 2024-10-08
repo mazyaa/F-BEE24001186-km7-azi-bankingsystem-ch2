@@ -41,10 +41,13 @@ class BankAccount {
             setTimeout(() => {
                 console.log('Saldo setelah penarikan Rp.', this.saldo);
             }, 7000); 
-
-            return this.saldo; 
        
     }
+    getBalance() {
+        return this.saldo;
+    }
+    
+
 
 }
 
