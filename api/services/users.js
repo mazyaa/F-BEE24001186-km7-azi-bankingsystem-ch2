@@ -1,5 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
 const prisma = new PrismaClient ();
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+
+dotenv.config({ path : '.env'});
 
 class User {
     id = null;
@@ -13,15 +18,38 @@ class User {
         this.password = password;
     }
 
-     async register() {
+    async register() {
+        const encryptedPassword = await this.getPassword();
         const user = await prisma.user.create({
             data : {
                 name : this.name,
                 email : this.email,
-                password : this.password,
+                password : encryptedPassword,
             },
         });
         this.setID(user.id);  
+        return user;
+    }
+
+    async login() {
+        const user = await prisma.user.findUnique({
+            where: { email: this.email },
+        });
+    
+        if (!user) {
+            throw new Error('User not found');
+        }
+    
+        const isPasswordValid = await bcrypt.compare(this.password, user.password);
+        if (!isPasswordValid) {
+            throw new Error('Incorrect password');
+        }
+    
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET_KEY, {
+            expiresIn: '1h', 
+        });
+    
+        return { user, token };
     }
 
     static async getAllData(){
@@ -87,8 +115,9 @@ class User {
         return this.id;
     }
 
-    getPassword() {
-        return '********';
+    async getPassword() {
+        const encryptedPassword = await bcrypt.hash(this.password, 10);
+        return encryptedPassword;
     }
 }
 

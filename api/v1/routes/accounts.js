@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Account } = require('../../services/accounts');
+const authenticateToken = require('../../../middleware/auth.middleware');
 
 
 const Joi = require('joi');
@@ -12,7 +13,7 @@ const schema = Joi.object({
 });
 
 // add new data on bankAccount
-router.post('/', async (req, res, next) => {
+router.post('/', authenticateToken, async (req, res, next) => {
     try {
         const { value, error } = schema.validate(req.body);
         if (error) return res.status(400).json({ error: error.details[0].message });
@@ -26,7 +27,7 @@ router.post('/', async (req, res, next) => {
 
 
 // GET data all from table bankAccount
-router.get('/', async (req, res, next) => {
+router.get('/', authenticateToken, async (req, res, next) => {
     try {
         const accounts = await Account.getAllAccounts();
         res.status(200).json(accounts);
@@ -36,7 +37,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // get all data in bankAccount by id 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id',authenticateToken, async (req, res, next) => {
     try {
         const account = await Account.getById(req.params.id);
 
@@ -51,7 +52,7 @@ router.get('/:id', async (req, res, next) => {
 });
 
 //deposit
-router.post('/:id/deposit', async (req, res, next) => {
+router.post('/:id/deposit', authenticateToken, async (req, res, next) => {
     try {
         const accountId = parseInt(req.params.id, 10);
         const { balance } = req.body; 
@@ -68,8 +69,10 @@ router.post('/:id/deposit', async (req, res, next) => {
     }
 });
 
+
+
 //withdraw
-router.post('/:id/withdraw', async (req, res, next) => {
+router.post('/:id/withdraw', authenticateToken, async (req, res, next) => {
     try {
         const accountId = parseInt(req.params.id, 10);
         const { balance } = req.body;  

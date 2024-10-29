@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Transaction = require('../../services/transactions');
+const authenticateToken = require('../../../middleware/auth.middleware');
 const Joi = require('joi');
 
 
@@ -10,7 +11,7 @@ const transactionSchema = Joi.object({
 });
 
 // transaction 
-router.post('/', async (req, res, next) => {
+router.post('/', authenticateToken, async (req, res, next) => {
     try {
         const { value, error } = transactionSchema.validate(req.body);
         if (error) {
@@ -29,7 +30,7 @@ router.post('/', async (req, res, next) => {
 });
 
 // get all history
-router.get('/', async (req, res, next) => {
+router.get('/', authenticateToken, async (req, res, next) => {
     try {
         const transactions = await Transaction.getAll();
         res.status(200).json(transactions);
@@ -39,7 +40,7 @@ router.get('/', async (req, res, next) => {
 });
 
 //get history byId
-router.get('/:transactionId', async (req, res, next) => {
+router.get('/:transactionId', authenticateToken, async (req, res, next) => {
     try {
         const transactionId = parseInt(req.params.transactionId, 10); 
         const transaction = await Transaction.getById(transactionId);
