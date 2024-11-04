@@ -45,3 +45,10 @@ model Transaction {
   destinationAccount BankAccount @relation("transactionsTo", fields: [destinationAccountId], references: [id])
   destinationAccountId Int
 }
+
+model Media {
+  id           Int @id @default(autoincrement())
+  title        String
+  description  String
+  url          String
+}

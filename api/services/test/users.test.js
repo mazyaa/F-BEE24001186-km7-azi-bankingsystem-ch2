@@ -32,7 +32,7 @@ describe('User Service', () => {
 
             bcrypt.hash.mockResolvedValue('hashedPassword');
             mockPrisma.user.create.mockResolvedValue({ id: 1, ...newUser, password: 'hashedPassword' });
-
+            
             const user = new User(newUser.name, newUser.email, newUser.password);
             const createdUser = await user.register();
 
