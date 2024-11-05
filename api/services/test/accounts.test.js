@@ -58,6 +58,25 @@ describe('Account Service', () => {
         });
     });
 
+    describe('getById', () => {
+        test('should retrieve an account by ID', async () => {
+            const mockAccount = { id: 1, bankName: 'Bank A', bankAccountNumber: '1234567890', balance: 500 };
+
+            mockPrisma.bankAccount.findUnique.mockResolvedValue(mockAccount);
+
+            const account = await Account.getById(1);
+
+            expect(mockPrisma.bankAccount.findUnique).toHaveBeenCalledWith({ where: { id: 1 }, include: { user: true } });
+            expect(account).toEqual(mockAccount);
+        });
+
+        test('should throw an error if account does not exist', async () => {
+            mockPrisma.bankAccount.findUnique.mockResolvedValue(null);
+
+            await expect(Account.getById(999)).rejects.toThrow('Account with ID 999 not found');
+        });
+    });
+
     describe('deposit', () => {
         test('should deposit amount into account', async () => {
             const mockAccount = { id: 1, bankName: 'Bank A', bankAccountNumber: '1234567890', balance: 500 };
@@ -91,6 +110,20 @@ describe('Account Service', () => {
             expect(mockPrisma.bankAccount.findUnique).toHaveBeenCalledWith({ where: { id: 1 } });
             expect(mockPrisma.bankAccount.update).toHaveBeenCalledWith({ where: { id: 1 }, data: { balance: 400 } });
             expect(updatedAccount.balance).toBe(400);
+        });
+
+        test('should throw an error if account does not exist', async () => {
+            mockPrisma.bankAccount.findUnique.mockResolvedValue(null);
+
+            await expect(Account.withdraw(1, 100)).rejects.toThrow('Account with ID 1 not found');
+        });
+
+        test('should throw an error if balance is insufficient', async () => {
+            const mockAccount = { id: 1, bankName: 'Bank A', bankAccountNumber: '1234567890', balance: 50 };
+
+            mockPrisma.bankAccount.findUnique.mockResolvedValue(mockAccount);
+
+            await expect(Account.withdraw(1, 100)).rejects.toThrow('Insufficient balance');
         });
     });
 });

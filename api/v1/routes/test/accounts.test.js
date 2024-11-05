@@ -3,6 +3,7 @@ const express = require('express');
 const accountsRouter = require('../accounts');
 const { Account } = require('../../../services/accounts');
 
+// Mock the authentication middleware
 jest.mock('../../../../middleware/auth.middleware', () => {
     return jest.fn((req, res, next) => next()); // Bypass middleware
 });
@@ -45,7 +46,7 @@ describe('Accounts API', () => {
         test('should return 400 if validation fails', async () => {
             const response = await request(app)
                 .post('/api/accounts')
-                .send({}); 
+                .send({}); // Send an empty request body
 
             expect(response.status).toBe(400);
             expect(response.body.error).toBe('"bankName" is required');
@@ -106,10 +107,21 @@ describe('Accounts API', () => {
         test('should return 400 if deposit balance is invalid', async () => {
             const response = await request(app)
                 .post('/api/accounts/1/deposit')
-                .send({ balance: -100 }); 
+                .send({ balance: -100 }); // Invalid balance
 
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid deposit balance');
+        });
+
+        test('should return 404 if account does not exist', async () => {
+            Account.getById.mockResolvedValue(null); // Mocking the account to not exist
+
+            const response = await request(app)
+                .post('/api/accounts/999/deposit')
+                .send({ balance: 100 });
+
+            expect(response.status).toBe(404);
+            expect(response.body.message).toBe('Account not found');
         });
     });
 
@@ -129,18 +141,31 @@ describe('Accounts API', () => {
         test('should return 400 if withdraw balance is invalid', async () => {
             const response = await request(app)
                 .post('/api/accounts/1/withdraw')
-                .send({ balance: -500 }); 
+                .send({ balance: -500 }); // Invalid withdraw amount
 
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid withdraw balance');
         });
 
+        test('should return 404 if account does not exist', async () => {
+            Account.getById.mockResolvedValue(null); // Mocking the account to not exist
+
+            const response = await request(app)
+                .post('/api/accounts/999/withdraw')
+                .send({ balance: 100 });
+
+            expect(response.status).toBe(404);
+            expect(response.body.message).toBe('Account not found');
+        });
+
         test('should return 400 if insufficient balance', async () => {
+            const insufficientBalanceAccount = { id: 1, bankName: 'Bank A', balance: 500 };
+            Account.getById.mockResolvedValue(insufficientBalanceAccount);
             Account.withdraw.mockRejectedValue(new Error('Insufficient balance'));
 
             const response = await request(app)
                 .post('/api/accounts/1/withdraw')
-                .send({ balance: 1000 }); 
+                .send({ balance: 1000 }); // Trying to withdraw more than available
 
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Insufficient balance');

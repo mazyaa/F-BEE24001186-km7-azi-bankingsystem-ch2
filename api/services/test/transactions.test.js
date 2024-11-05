@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const Transaction = require('../transactions'); 
 
-// Mocking PrismaClient
 jest.mock('@prisma/client', () => {
     const mockPrismaClient = {
         bankAccount: {
@@ -32,12 +31,12 @@ describe('Transaction Service', () => {
             const amount = 100;
 
             prisma.bankAccount.findUnique
-                .mockResolvedValueOnce({ id: sourceAccountId, balance: 200 }) // Akun sumber ditemukan
-                .mockResolvedValueOnce({ id: destinationAccountId, balance: 50 }); // Akun tujuan ditemukan
+                .mockResolvedValueOnce({ id: sourceAccountId, balance: 200 })
+                .mockResolvedValueOnce({ id: destinationAccountId, balance: 50 }); 
 
             prisma.bankAccount.update
-                .mockResolvedValueOnce({ id: sourceAccountId, balance: 100 }) // Update saldo sumber
-                .mockResolvedValueOnce({ id: destinationAccountId, balance: 150 }); // Update saldo tujuan
+                .mockResolvedValueOnce({ id: sourceAccountId, balance: 100 }) 
+                .mockResolvedValueOnce({ id: destinationAccountId, balance: 150 }); 
 
             prisma.transaction.create.mockResolvedValue({
                 id: 1,
@@ -58,10 +57,34 @@ describe('Transaction Service', () => {
             expect(prisma.transaction.create).toHaveBeenCalled();
         });
 
+        test('should throw an error if source account does not exist', async () => {
+            const sourceAccountId = 1;
+            const destinationAccountId = 2;
+            const amount = 100;
+
+            prisma.bankAccount.findUnique.mockResolvedValueOnce(null); 
+
+            await expect(Transaction.transfer(sourceAccountId, destinationAccountId, amount)).rejects.toThrow('Source account not found');
+            expect(prisma.bankAccount.findUnique).toHaveBeenCalledWith({ where: { id: sourceAccountId } });
+        });
+
+        test('should throw an error if destination account does not exist', async () => {
+            const sourceAccountId = 1;
+            const destinationAccountId = 2;
+            const amount = 100;
+
+            prisma.bankAccount.findUnique
+                .mockResolvedValueOnce({ id: sourceAccountId, balance: 200 }) 
+                .mockResolvedValueOnce(null); 
+
+            await expect(Transaction.transfer(sourceAccountId, destinationAccountId, amount)).rejects.toThrow('Destination account not found');
+            expect(prisma.bankAccount.findUnique).toHaveBeenCalledTimes(2);
+        });
+
         test('should throw an error if source account has insufficient balance', async () => {
             prisma.bankAccount.findUnique
-                .mockResolvedValueOnce({ id: 1, balance: 50 }) // Saldo sumber tidak cukup
-                .mockResolvedValueOnce({ id: 2, balance: 100 }); // Akun tujuan ditemukan
+                .mockResolvedValueOnce({ id: 1, balance: 50 }) 
+                .mockResolvedValueOnce({ id: 2, balance: 100 }); 
 
             await expect(Transaction.transfer(1, 2, 100)).rejects.toThrow('Insufficient balance');
         });
@@ -105,12 +128,10 @@ describe('Transaction Service', () => {
             });
         });
 
-        test('should return null if transaction not found', async () => {
+        test('should throw an error if transaction not found', async () => {
             prisma.transaction.findUnique.mockResolvedValue(null);
 
-            const transaction = await Transaction.getById(999);
-
-            expect(transaction).toBeNull();
+            await expect(Transaction.getById(999)).rejects.toThrow('Transaction not found');
             expect(prisma.transaction.findUnique).toHaveBeenCalledWith({
                 where: { id: 999 },
                 include: { sourceAccount: true, destinationAccount: true },
