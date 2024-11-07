@@ -1,28 +1,26 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ "main" ]  # Trigger on push to the main branch
-
+  pull_request:
+    branches: [ "main" ]
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4  # Checkout the code
-
+    - uses: actions/checkout@v4  
     - name: Use Node.js 18.x
       uses: actions/setup-node@v4
       with:
         node-version: 18.x
         cache: 'npm'
 
-    - run: npm install  # Install dependencies
-    - run: npm run build --if-present  # Build the project if there's a build script
+    - run: npm install  
+    - run: npm run build --if-present  
 
-    - name: Run ESLint (Linter)  # Add this step to run ESLint
+    - name: Run ESLint (Linter)  
       run: |
-        npm install eslint --save-dev  # Install ESLint if not already installed
-        npx eslint . --ext .js,.jsx,.ts,.tsx  # Run ESLint on all JS, JSX, TS, and TSX files
+        npm install eslint --save-dev  
+        npx eslint . --ext .js,.jsx,.ts,.tsx  
 
-    - run: npm test  # Run tests
+    - run: npm test  
