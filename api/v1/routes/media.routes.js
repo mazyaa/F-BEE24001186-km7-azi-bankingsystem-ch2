@@ -7,7 +7,8 @@ const {
     imagekitUpload, 
     getAll,
     getById,
-    putMedia
+    putMedia,
+    deleteMedia
 } = require('../../../controllers/media.controllers');
 
 
@@ -23,6 +24,7 @@ router.get('/media/:id', getById);
 router.put('/media/:id', putMedia);
 
 //delete media
+router.delete('/media/:id', deleteMedia);
 
 const multer = require('multer')();
 router.post('/imagekit', multer.single('image'), imagekitUpload);

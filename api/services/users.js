@@ -71,7 +71,7 @@ class User {
         return await prisma.user.update({
             where: {
                 id : userId,
-            },
+            },  
 
             data : {
                 name: data.name, 
@@ -89,7 +89,7 @@ class User {
         });
 
         if (!user) {
-            throw new Error(`User with ID ${userId} not found`);
+            throw new Error(`User not found`);
         }
 
         // delete dulu profilenya

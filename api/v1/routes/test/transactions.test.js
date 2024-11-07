@@ -53,6 +53,17 @@ describe('Transactions API', () => {
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('"amount" must be a positive number');
         });
+
+        test('should handle internal server error during transaction creation', async () => {
+            Transaction.transfer.mockRejectedValue(new Error('Internal server error'));
+
+            const response = await request(app)
+                .post('/api/transactions')
+                .send({ sourceAccountId: 1, destinationAccountId: 2, amount: 1000 });
+
+            expect(response.status).toBe(500);
+            expect(response.body.message).toBe('Internal server error');
+        });
     });
 
     describe('GET /', () => {
@@ -68,6 +79,15 @@ describe('Transactions API', () => {
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(transactions);
+        });
+
+        test('should handle internal server error when fetching transactions', async () => {
+            Transaction.getAll.mockRejectedValue(new Error('Internal server error'));
+
+            const response = await request(app).get('/api/transactions');
+
+            expect(response.status).toBe(500);
+            expect(response.body.message).toBe('Internal server error');
         });
     });
 
@@ -90,6 +110,15 @@ describe('Transactions API', () => {
 
             expect(response.status).toBe(404);
             expect(response.body.message).toBe('Transaction not found');
+        });
+
+        test('should handle internal server error when fetching transaction by id', async () => {
+            Transaction.getById.mockRejectedValue(new Error('Internal server error'));
+
+            const response = await request(app).get('/api/transactions/1');
+
+            expect(response.status).toBe(500);
+            expect(response.body.message).toBe('Internal server error');
         });
     });
 });

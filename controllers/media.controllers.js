@@ -153,13 +153,42 @@ module.exports = {
             res.status(200).json({
                 message : 'Update Succes!',
                 data : updateMedia
-            });
+            });   
 
         }catch(err){
+            console.log(err);
             return(next);
         }
     },
 ],
+
+deleteMedia : async (req, res, next) =>{
+    try{
+        const mediaId = parseInt(req.params.id, 10);
+        const { title, id } = (req.body);
+
+        const media = await prisma.media.findUnique({
+            where: { 
+                id: mediaId 
+            },
+        });
+
+        if (!media) {
+            return res.status(404).json({ message: 'Media not found!' });
+        }
+        const deleteMedia = await prisma.media.delete({
+            where : {
+                id : mediaId
+            }
+        });
+
+        return res.status(200).json({
+            message : 'Delete Succes!'
+        });
+    }catch(err){
+        next(err);
+    }
+},
 
 
     

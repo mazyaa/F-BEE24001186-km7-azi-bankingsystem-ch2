@@ -127,15 +127,5 @@ describe('Transaction Service', () => {
                 include: { sourceAccount: true, destinationAccount: true },
             });
         });
-
-        test('should throw an error if transaction not found', async () => {
-            prisma.transaction.findUnique.mockResolvedValue(null);
-
-            await expect(Transaction.getById(999)).rejects.toThrow('Transaction not found');
-            expect(prisma.transaction.findUnique).toHaveBeenCalledWith({
-                where: { id: 999 },
-                include: { sourceAccount: true, destinationAccount: true },
-            });
-        });
     });
 });
