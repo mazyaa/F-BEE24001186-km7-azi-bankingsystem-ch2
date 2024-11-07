@@ -19,15 +19,26 @@ class User {
     }
 
     async register() {
-        const encryptedPassword = await this.getPassword();
+     
+        const existingUser = await prisma.user.findUnique({
+            where: { email: this.email },
+        });
+        if (existingUser) {
+            throw new Error('User already exists');
+        }
+
+    
+        const encryptedPassword = await bcrypt.hash(this.password, 10);
+
         const user = await prisma.user.create({
-            data : {
-                name : this.name,
-                email : this.email,
-                password : encryptedPassword,
+            data: {
+                name: this.name,
+                email: this.email,
+                password: encryptedPassword,
             },
         });
-        this.setID(user.id);  
+        
+        this.id = user.id;
         return user;
     }
 
@@ -67,17 +78,24 @@ class User {
         });
     }
 
-    static async updateUser(userId, data){
-        return await prisma.user.update({
-            where: {
-                id : userId,
-            },
+    static async updateUser(userId, data) {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+        });
 
-            data : {
-                name: data.name, 
-                email: data.email, 
-                password: data.password,
-            },  
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        
+        const updatedData = { ...data };
+        if (data.password) {
+            updatedData.password = await bcrypt.hash(data.password, 10);
+        }
+
+        return await prisma.user.update({
+            where: { id: userId },
+            data: updatedData,
         });
     }
 
@@ -89,7 +107,7 @@ class User {
         });
 
         if (!user) {
-            throw new Error(`User with ID ${userId} not found`);
+            throw new Error(`User not found`);
         }
 
         // delete dulu profilenya
@@ -107,13 +125,13 @@ class User {
         });
     }
 
-    setID(id) {
-        this.id = id;
-    }
+    // setID(id) {
+    //     this.id = id;
+    // }
 
-    getID() {
-        return this.id;
-    }
+    // getID() {
+    //     return this.id;
+    // }
 
     async getPassword() {
         const encryptedPassword = await bcrypt.hash(this.password, 10);

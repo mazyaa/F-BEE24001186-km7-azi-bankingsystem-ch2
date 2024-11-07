@@ -28,13 +28,13 @@ describe('Auth Middleware Tests', () => {
         authenticateToken(req, res, next);
 
         expect(res.status).toHaveBeenCalledWith(401);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Unauthorized' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'invalid token' });
     });
 
     it('should return 401 if no token is provided', () => {
         authenticateToken(req, res, next);
 
         expect(res.status).toHaveBeenCalledWith(401);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Unauthorized' });
+        expect(res.json).toHaveBeenCalledWith({ message: 'Acess denied : no token provided' });
     });
 });

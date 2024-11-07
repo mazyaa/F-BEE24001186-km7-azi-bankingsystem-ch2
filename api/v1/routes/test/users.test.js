@@ -1,151 +1,261 @@
 const request = require('supertest');
 const express = require('express');
-const usersRouter = require('../users');
-const { User } = require('../../../services/users');
+const router = require('../../routes/users'); 
+const { User } = require('../../../services/users'); 
+
+jest.mock('../../../services/users'); 
 
 const app = express();
 app.use(express.json());
-app.use('/users', usersRouter);
+app.use('/users', router);
 
-jest.mock('../../../services/users');
+
+let server;
+
+beforeAll(() => {
+  server = app.listen(3000);
+});
+
+afterAll((done) => {
+  server.close(done);
+});
 
 describe('User Routes', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+  const sampleUser = {
+    id: 1,
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'securePassword123',
+  };
 
-    describe('POST /users/register', () => {
-        test('should create a new user and return 201', async () => {
-            const mockUser = { name: 'John Doe', email: 'john@example.com', password: 'password' };
-            User.mockImplementation(() => {
-                return {
-                    register: jest.fn().mockResolvedValue(true),
-                    getID: jest.fn().mockReturnValue(1),
-                    name: mockUser.name,
-                    email: mockUser.email,
-                };
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+
+  describe('POST /users/register', () => {
+    it('should register a new user', async () => {
+        User.prototype.register = jest.fn().mockResolvedValue({
+            id: 1,
+            name: 'Test User',
+            email: 'test@example.com',
+            password: 'hashedPassword', 
+        });
+        User.prototype.getID = jest.fn().mockReturnValue(1);
+
+        const res = await request(server)
+            .post('/users/register')
+            .send({
+                name: 'Test User',
+                email: 'test@example.com',
+                password: 'securePassword123',
             });
 
-            const response = await request(app).post('/users/register').send(mockUser);
-
-            expect(response.status).toBe(201);
-            expect(response.body).toEqual({
-                status: true,
-                message: 'User created successfully',
-                data: {
-                    id: 1,
-                    name: mockUser.name,
-                    email: mockUser.email,
-                },
-            });
-        });
-
-        test('should return 400 for validation error', async () => {
-            const response = await request(app).post('/users/register').send({ email: 'john@example.com' });
-
-            expect(response.status).toBe(400);
-            expect(response.body.message).toBe('Validation Error');
+        expect(res.statusCode).toBe(201);
+        expect(res.body).toEqual({
+            status: true,
+            message: 'User created successfully',
+            data: {
+                id: 1,
+                name: 'Test User',
+                email: 'test@example.com',
+            },
         });
     });
 
-    describe('POST /users/login', () => {
-        test('should login user and return 200', async () => {
-            const mockLoginData = { email: 'john@example.com', password: 'password' };
-            User.mockImplementation(() => {
-                return {
-                    login: jest.fn().mockResolvedValue({ token: 'abcd1234', user: { name: 'John Doe', email: mockLoginData.email } }),
-                };
+    it('should return validation error for invalid input', async () => {
+        const res = await request(server)
+            .post('/users/register')
+            .send({
+                name: '', 
+                email: 'invalid-email', 
+                password: '', 
             });
 
-            const response = await request(app).post('/users/login').send(mockLoginData);
-
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual({
-                status: true,
-                message: 'Login successful',
-                data: {
-                    token: 'abcd1234',
-                    user: {
-                        name: 'John Doe',
-                        email: mockLoginData.email,
-                    },
-                },
-            });
-        });
-
-        test('should return 400 for validation error', async () => {
-            const response = await request(app).post('/users/login').send({ email: 'john@example.com' });
-
-            expect(response.status).toBe(400);
-            expect(response.body.message).toBe('Validation Error');
+        expect(res.statusCode).toBe(400);
+        expect(res.body).toEqual({
+            status: false,
+            message: 'Validation Error',
+            error: expect.any(String),
+            data: null, 
         });
     });
 
-    describe('GET /users', () => {
-        test('should return all users and 200', async () => {
-            const mockUsers = [{ id: 1, name: 'John Doe', email: 'john@example.com' }];
-            User.getAllData.mockResolvedValue(mockUsers);
 
-            const response = await request(app).get('/users');
 
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(mockUsers);
+
+    it('should handle server error on registration', async () => {
+      User.prototype.register = jest.fn().mockRejectedValue(new Error('Server error'));
+
+      const res = await request(server) 
+        .post('/users/register')
+        .send({
+          name: 'Test',
+          email: 'test@example.com',
+          password: 'securePassword123',
         });
+
+      expect(res.statusCode).toBe(500);
+      expect(res.body.message).toBe('Server error');
     });
+  });
 
-    describe('GET /users/:userId', () => {
-        test('should return user by ID and 200', async () => {
-            const mockUser = { id: 1, name: 'John Doe', email: 'john@example.com' };
-            User.getById.mockResolvedValue(mockUser);
 
-            const response = await request(app).get('/users/1');
 
-            expect(response.status).toBe(202);
-            expect(response.body).toEqual(mockUser);
-        });
+  describe('POST /users/login', () => {
+    const sampleUser = { email: 'test@example.com', password: 'password123', name: 'Test User' };
 
-        test('should return 404 if user not found', async () => {
-            User.getById.mockResolvedValue(null);
+    it('should login a user with valid credentials', async () => {
+        const loginResponse = {
+            token: 'fake-jwt-token',
+            user: sampleUser,
+        };
 
-            const response = await request(app).get('/users/999');
+        User.prototype.login = jest.fn().mockResolvedValue(loginResponse);
 
-            expect(response.status).toBe(404);
-            expect(response.body.message).toBe('User not found!!!');
-        });
-    });
-
-    describe('PUT /users/:userId', () => {
-        test('should update user and return 200', async () => {
-            const mockUpdateData = { name: 'John Doe Updated', email: 'john_updated@example.com', password: 'newpassword' };
-            User.updateUser.mockResolvedValue(mockUpdateData);
-
-            const response = await request(app).put('/users/1').send(mockUpdateData);
-
-            expect(response.status).toBe(200);
-            expect(response.body.message).toBe('Update succesfuly!');
-            expect(response.body.user).toEqual(mockUpdateData);
-        });
-    });
-
-    describe('DELETE /users/:userId', () => {
-        test('should delete user and return 200', async () => {
-            User.deleteUser.mockResolvedValue();
-
-            const response = await request(app).delete('/users/1');
-
-            expect(response.status).toBe(200);
-            expect(response.body.message).toBe('user with id : 1, deleted succesfully!');
-        });
-
-        test('should return 404 if user not found', async () => {
-            User.deleteUser.mockImplementation(() => {
-                throw new Error('not found');
+        const res = await request(app)
+            .post('/users/login')
+            .send({
+                email: sampleUser.email,
+                password: sampleUser.password,
             });
 
-            const response = await request(app).delete('/users/999');
-
-            expect(response.status).toBe(404);
-            expect(response.body.message).toBe('not found');
-        });
+        expect(res.statusCode).toBe(200);
+        expect(res.body.message).toBe('Login successful');
+        expect(res.body.data.token).toBe('fake-jwt-token');
+        expect(res.body.data.user.email).toBe(sampleUser.email);
+        expect(res.body.data.user.name).toBe(sampleUser.name);
     });
+
+   
+    it('should return error for invalid credentials', async () => {
+        User.prototype.login = jest.fn().mockRejectedValue(new Error('Invalid credentials'));
+
+        const res = await request(app)
+            .post('/users/login')
+            .send({
+                email: sampleUser.email,
+                password: 'wrongpassword',
+            });
+
+        expect(res.statusCode).toBe(400);
+        expect(res.body.message).toBe('Invalid email or password');
+        expect(res.body.data).toBeNull();
+    });
+});
+
+
+  describe('GET /users', () => {
+    it('should get all users', async () => {
+      User.getAllData = jest.fn().mockResolvedValue([sampleUser]);
+
+      const res = await request(app).get('/users');
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toEqual([sampleUser]);
+    });
+
+    it('should handle server error on getting all users', async () => {
+      User.getAllData = jest.fn().mockRejectedValue(new Error('Server error'));
+
+      const res = await request(app).get('/users');
+
+      expect(res.statusCode).toBe(500);
+      expect(res.body.message).toBe('Server error');
+    });
+  });
+
+  describe('GET /users/:userId', () => {
+    it('should get a user by ID', async () => {
+      User.getById = jest.fn().mockResolvedValue(sampleUser);
+
+      const res = await request(app).get('/users/1');
+
+      expect(res.statusCode).toBe(202);
+      expect(res.body).toEqual(sampleUser);
+    });
+
+    it('should return 404 if user not found', async () => {
+      User.getById = jest.fn().mockResolvedValue(null);
+
+      const res = await request(app).get('/users/999');
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.message).toBe('User not found!!!');
+    });
+
+    it('should handle server error on getting user by ID', async () => {
+      User.getById = jest.fn().mockRejectedValue(new Error('Server error'));
+
+      const res = await request(app).get('/users/1');
+
+      expect(res.statusCode).toBe(500);
+      expect(res.body.message).toBe('Server error');
+    });
+  });
+
+  describe('PUT /users/:userId', () => {
+    it('should update a user by ID', async () => {
+      User.updateUser = jest.fn().mockResolvedValue({
+        ...sampleUser,
+        name: 'Updated User',
+      });
+
+      const res = await request(app)
+        .put('/users/1')
+        .send({
+          name: 'Updated User',
+          email: sampleUser.email,
+          password: sampleUser.password,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe('Update succesfuly!');
+      expect(res.body.user.name).toBe('Updated User');
+    });
+
+    it('should handle server error on updating user', async () => {
+      User.updateUser = jest.fn().mockRejectedValue(new Error('Server error'));
+
+      const res = await request(app)
+        .put('/users/1')
+        .send({
+          name: 'Updated User',
+          email: sampleUser.email,
+          password: sampleUser.password,
+        });
+
+      expect(res.statusCode).toBe(500);
+      expect(res.body.message).toBe('Server error');
+    });
+  });
+
+  describe('DELETE /users/:userId', () => {
+    it('should delete a user by ID', async () => {
+      User.deleteUser = jest.fn().mockResolvedValue();
+
+      const res = await request(app).delete('/users/1');
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.message).toBe('user with id : 1, deleted succesfully!');
+    });
+
+    it('should return 404 if user to delete is not found', async () => {
+      User.deleteUser = jest.fn().mockRejectedValue(new Error('User not found'));
+
+      const res = await request(app).delete('/users/999');
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body.message).toBe('User not found');
+    });
+
+    it('should handle server error on deleting user', async () => {
+      User.deleteUser = jest.fn().mockRejectedValue(new Error('Server error'));
+
+      const res = await request(app).delete('/users/1');
+
+      expect(res.statusCode).toBe(500);
+      expect(res.body.message).toBe('Server error');
+    });
+  });
 });

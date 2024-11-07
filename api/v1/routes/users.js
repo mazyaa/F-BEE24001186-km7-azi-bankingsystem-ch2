@@ -23,20 +23,26 @@ router.post('/register', async (req, res, next) => {
 
     
         const user = new User(value.name, value.email, value.password);
-        await user.register();
+        const createdUser = await user.register();
 
    
         res.status(201).json({
             status: true,
             message: "User created successfully",
             data: {
-                id: user.getID(),
-                name: user.name,
-                email: user.email
+                id: createdUser.id,
+                name: createdUser.name,
+                email: createdUser.email
             },
         });
     } catch (error) {
         next(error);
+        res.status(500).json({
+            status: false,
+            message: 'Server error',
+            error: error.message,
+            data: null,
+        });
     }
 });
 
@@ -77,7 +83,7 @@ router.post('/login', async (req, res, next) => {
     } catch (error) {
         res.status(400).json({
             status: false,
-            message: error.message,
+            message: 'Invalid email or password',
             data: null,
         });
     }
@@ -91,6 +97,9 @@ router.get('/', async (req, res, next) =>{
         res.status(200).json(users);
     } catch(error){
         next(error);
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -105,6 +114,9 @@ router.get('/:userId', async (req, res, next) =>{
         res.status(202).json(user)
     } catch (error){
         next(error);
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 });
 
@@ -125,6 +137,9 @@ router.put('/:userId', async(req, res, next) =>{
 
     } catch (error){
         next(error);
+        res.status(500).json({
+            message: 'Server error'
+        });
     }
 
 });
@@ -145,6 +160,9 @@ router.delete('/:userId', async (req, res, next) =>{
             });
         } else {
             next(error);
+            res.status(500).json({
+                message: 'Server error'
+            });
         }
     }
 });

@@ -30,16 +30,21 @@ class Account {
     }
 
     static async getById(accountId) {
-        return await prisma.bankAccount.findUnique({
+        const account = await prisma.bankAccount.findUnique({
             where: { 
                 id: parseInt(accountId)
-             },
+            },
             include: { 
                 user: true
-             }, 
+            }, 
         });
+    
+        if (!account) {
+            throw new Error(`Account with ID ${accountId} not found`);
+        }
+    
+        return account;
     }
-
 
     static async deposit(accountId, balance) {  
         const account = await prisma.bankAccount.findUnique({

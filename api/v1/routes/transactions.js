@@ -25,7 +25,8 @@ router.post('/', authenticateToken, async (req, res, next) => {
 
         res.status(201).json(transaction);
     } catch (error) {
-        next(error);
+        res.status(500).json({ message: 'Internal server error' }); 
+        next(error); 
     }
 });
 
@@ -35,14 +36,15 @@ router.get('/', authenticateToken, async (req, res, next) => {
         const transactions = await Transaction.getAll();
         res.status(200).json(transactions);
     } catch (error) {
-        next(error);
+        res.status(500).json({ message: 'Internal server error' }); 
+        next(error); 
     }
 });
 
 //get history byId
 router.get('/:transactionId', authenticateToken, async (req, res, next) => {
     try {
-        const transactionId = parseInt(req.params.transactionId, 10); 
+        const transactionId = parseInt(req.params.transactionId, 10);
         const transaction = await Transaction.getById(transactionId);
 
         if (!transaction) {
@@ -51,8 +53,10 @@ router.get('/:transactionId', authenticateToken, async (req, res, next) => {
 
         res.status(200).json(transaction);
     } catch (error) {
-        next(error);
+        res.status(500).json({ message: 'Internal server error' }); 
+        next(error); 
     }
 });
+
 
 module.exports = router;

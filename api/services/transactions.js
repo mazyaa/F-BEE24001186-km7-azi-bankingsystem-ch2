@@ -73,15 +73,21 @@ class Transaction {
 
     // get history byId
     static async getById(transactionId) {
-        return await prisma.transaction.findUnique({
+        const transaction = await prisma.transaction.findUnique({
             where: {
                 id: transactionId,
             },
             include: {
-                sourceAccount: true, 
-                destinationAccount: true, 
+                sourceAccount: true,
+                destinationAccount: true,
             },
         });
+
+        if (!transaction) {
+            throw new Error('Transaction not found');
+        }
+
+        return transaction;
     }
 }
 
