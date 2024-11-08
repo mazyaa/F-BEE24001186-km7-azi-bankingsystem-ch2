@@ -107,7 +107,7 @@ class User {
         });
 
         if (!user) {
-            throw new Error(`User not found`);
+            throw new Error('User not found');
         }
 
         // delete dulu profilenya

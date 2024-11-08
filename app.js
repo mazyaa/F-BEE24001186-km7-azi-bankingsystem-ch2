@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./swagger.json');
-const mediaRouter = require('./api/v1/routes/media.routes')
+const mediaRouter = require('./api/v1/routes/media.routes');
 const app = express();
 const port = 3000;
 
@@ -11,7 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.set('view engine', 'ejs');
 app.get('/', (req, res) =>{
-    return res.render('welcome')
+    return res.render('welcome');
 });
 
 app.use('/images', express.static('../../public/images'));
@@ -38,7 +38,7 @@ app.use('/api/v1/auth', require('./api/v1/routes/users'));
 
 
 // Error handling
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error(err.stack);
     if (err.isJoi) {
         res.status(400).json({

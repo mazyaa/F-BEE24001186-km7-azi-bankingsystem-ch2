@@ -7,7 +7,7 @@ const {
 } = process.env;
 
 module.exports = new Imagekit({
-    publicKey:"public_dE5xk0lb7yNuMF8d3GLusxi8BTk=",
-    privateKey:"private_7DyIri028EYzGB/Or+g9XADzgvc=",
-    urlEndpoint:"https://ik.imagekit.io/rpg3cd9fm"
+    publicKey:'public_dE5xk0lb7yNuMF8d3GLusxi8BTk=',
+    privateKey:'private_7DyIri028EYzGB/Or+g9XADzgvc=',
+    urlEndpoint:'https://ik.imagekit.io/rpg3cd9fm'
 });

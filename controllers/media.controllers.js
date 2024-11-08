@@ -30,7 +30,7 @@ module.exports = {
             });
             return image;
         }catch(err){
-            return(next);
+            next(err);
         }
     },
     storageVideo : async (req, res, next) =>{
@@ -56,7 +56,7 @@ module.exports = {
             });
             return video;
         }catch(err){
-            return(next);
+            next(err);
         }
     },
     storageFile : async (req, res, next) =>{
@@ -82,7 +82,7 @@ module.exports = {
                 });
                 return file;
         }catch(err){
-            return(next);
+            next(err);
         }
     },
 
@@ -93,8 +93,6 @@ module.exports = {
         }catch(err){
             next(err);
         }
-
-        return all;
     },
 
     getById : async (req, res, next) =>{
@@ -153,14 +151,43 @@ module.exports = {
             res.status(200).json({
                 message : 'Update Succes!',
                 data : updateMedia
-            });
+            });   
 
         }catch(err){
+            console.log(err);
             return(next);
         }
     },
 ],
 
+deleteMedia : async (req, res, next) =>{
+    try{
+        const mediaId = parseInt(req.params.id, 10);
+
+        const media = await prisma.media.findUnique({
+            where: { 
+                id: mediaId 
+            },
+        });
+
+        if (!media) {
+            return res.status(404).json({ message: 'Media not found!' });
+        }
+        const deleteMedia = await prisma.media.delete({
+            where : {
+                id : mediaId
+            }
+        });
+
+        return res.status(200).json({
+            message : 'Delete Succes!',
+            data : deleteMedia
+        });
+
+    }catch(err){
+        next(err);
+    }
+},
 
     
     imagekitUpload : async (req, res) =>{

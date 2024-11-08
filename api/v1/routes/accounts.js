@@ -28,6 +28,7 @@ router.post('/', authenticateToken, async (req, res, next) => {
         const account = await Account.createAccount(value);
         res.status(201).json(account);
     } catch (error) {
+        next(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -40,6 +41,7 @@ router.get('/', authenticateToken, async (req, res, next) => {
         const accounts = await Account.getAllAccounts();
         res.status(200).json(accounts);
     } catch (error) {
+        next(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -57,6 +59,7 @@ router.get('/:id', authenticateToken, async (req, res, next) => {
 
         res.status(200).json(account);
     } catch (error) {
+        next(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

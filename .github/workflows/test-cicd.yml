@@ -3,24 +3,27 @@ name: Node.js CI
 on:
   pull_request:
     branches: [ "main" ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4  
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18.x
-        cache: 'npm'
+      - uses: actions/checkout@v4  
 
-    - run: npm install  
-    - run: npm run build --if-present  
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'npm'
 
-    - name: Run ESLint (Linter)  
-      run: |
-        npm install eslint --save-dev  
-        npx eslint . --ext .js,.jsx,.ts,.tsx  
+      - run: npm install  
 
-    - run: npm test  
+      - run: npm run build --if-present  
+
+      - name: Run ESLint (Linter)  
+        run: |
+          npm install eslint --save-dev  
+          npx eslint .  
+
+      - run: npm test

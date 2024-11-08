@@ -21,6 +21,6 @@ const authenticateToken  = (req, res, next) => {
         req.user = user;
         next();
     });
-}
+};
 
 module.exports = authenticateToken;

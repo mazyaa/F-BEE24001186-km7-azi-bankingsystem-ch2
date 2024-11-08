@@ -2,7 +2,7 @@
 class InsufficientFundsError extends Error {
     constructor(message) {
         super(message);
-        this.name = "InsufficientFundsError";
+        this.name = 'InsufficientFundsError';
     }
 }
 
@@ -35,7 +35,7 @@ class BankAccount {
             setTimeout(()=>{
                 this.saldo -= amount;  
                 console.log('Telah melakukan penarikan sebanyak Rp.', amount);
-            }, 4000)
+            }, 4000);
 
             // nampilin saldo setelah wd
             setTimeout(() => {
