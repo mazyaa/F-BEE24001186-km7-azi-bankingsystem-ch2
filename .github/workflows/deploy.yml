@@ -29,7 +29,7 @@ jobs:
             # Source nvm if needed
             source ~/.nvm/nvm.sh
             
-            # Navigate to the application directory (make sure this path is correct)
+            # Navigate to the application directory (
             cd /home/ubuntu/F-BEE24001186-km7-azi-banking-system-ch2
 
             # Ensure the directory is correct
