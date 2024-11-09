@@ -4,7 +4,9 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./swagger.json');
 const mediaRouter = require('./api/v1/routes/media.routes');
 const app = express();
-const port = 3000;
+require('dotenv').config();
+const appUrl = process.env.APP_URL;
+const nodeEnv = process.env.NODE_ENV;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -50,8 +52,9 @@ app.use((err, req, res) => {
         message: 'Internal server error',
     });
 });
+const port = process.env.PORT || 3000; 
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-    console.log('API docs avaliable at http://localhost:3000/api-docs');
-});
+    console.log(`Server running on ${appUrl} in ${nodeEnv} mode`);
+    console.log(`API docs available at http://${appUrl}/api-docs`);
+  });
