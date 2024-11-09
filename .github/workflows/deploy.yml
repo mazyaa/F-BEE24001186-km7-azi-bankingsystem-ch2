@@ -19,27 +19,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      # Step 3: Install dependencies on EC2 (e.g., Node.js, npm, PM2)
-      - name: Install dependencies on EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
-            # Update package list
-            sudo apt-get update -y
-
-            # Install Node.js and npm (if not installed)
-            sudo apt-get install -y nodejs npm
-
-            # Install PM2 globally
-            sudo npm install pm2 -g
-          EOF
 
       # Step 4: Deploy to EC2
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
 
-            # Navigate to project directory (make sure this directory exists)
-            cd /path/to/your/project
+            # Navigate to project directory 
+            cd F-BEE24001186-km7-azi-banking-system-ch2 
 
             # Pull updates from main branch
             git pull origin main
