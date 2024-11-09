@@ -30,4 +30,7 @@ jobs:
           npm install
           npx prisma generate
           pm2 restart my-app || pm2 start app.js --name my-app
+          pm2 save
+          pm2 startup systemd --hp /home/ubuntu
+          pm2 save
           EOF
