@@ -1,0 +1,44 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up SSH
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          
+      # Step 3: Deploy to EC2
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+
+            #dir prject
+            cd ~/OneDrive/Desktop/F-BEE24001186-km7-azi-banking-system-ch2
+
+            #pull update on main
+            git pull origin main
+
+            #install depedencies 
+            npm install
+
+            #generate prisma client
+            npx prisma generate
+
+            #restart app with pm2
+            pm2 restart "my-app" || pm2 start app.js --name "my-app"
+
+            #save configuration process PM2
+            
+          EOF
