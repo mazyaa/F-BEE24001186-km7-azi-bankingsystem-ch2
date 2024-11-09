@@ -36,7 +36,7 @@ jobs:
             #generate prisma client
             npx prisma generate
 
-            #restart app with pm2
+            #restart application with pm2 
             pm2 restart "my-app" || pm2 start app.js --name "my-app"
 
             #save configuration process PM2
