@@ -25,7 +25,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << EOF
             # Ensure the project directory exists or clone the repository if not present
             if [ ! -d "F-BEE24001186-km7-azi-banking-system-ch2" ]; then
-              git clone https://github.com/your-username/your-repository.git F-BEE24001186-km7-azi-banking-system-ch2
+              git clone https://github.com/AziSudarya1/F-BEE24001186-km7-azi-bankingsystem-ch2.git F-BEE24001186-km7-azi-banking-system-ch2
             fi
 
             # Navigate to the project directory
