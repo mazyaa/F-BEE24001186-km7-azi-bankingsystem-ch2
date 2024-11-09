@@ -22,7 +22,7 @@ jobs:
 
       # Step 4: Deploy to EC2
       - name: Deploy to EC2
-        run: |
+        run: |  
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << EOF
           source ~/.nvm/nvm.sh
           cd F-BEE24001186-km7-azi-banking-system-ch2

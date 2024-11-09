@@ -40,18 +40,20 @@ app.use('/api/v1/auth', require('./api/v1/routes/users'));
 
 
 // Error handling
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
     console.error(err.stack);
+
     if (err.isJoi) {
-        res.status(400).json({
+        return res.status(400).json({
             message: err.message,
         });
     }
-
-    res.status(500).json({
+    return res.status(500).json({
         message: 'Internal server error',
     });
 });
+
+
 const port = process.env.PORT || 3000; 
 
 app.listen(port, () => {
