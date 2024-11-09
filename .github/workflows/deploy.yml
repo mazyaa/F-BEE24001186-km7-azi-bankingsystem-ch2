@@ -18,27 +18,41 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
-          
-      # Step 3: Deploy to EC2
+
+      # Step 3: Install dependencies on EC2 (e.g., Node.js, npm, PM2)
+      - name: Install dependencies on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            # Update package list
+            sudo apt-get update -y
+
+            # Install Node.js and npm (if not installed)
+            sudo apt-get install -y nodejs npm
+
+            # Install PM2 globally
+            sudo npm install pm2 -g
+          EOF
+
+      # Step 4: Deploy to EC2
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
 
-            #dir prject
-            cd ~/OneDrive/Desktop/F-BEE24001186-km7-azi-banking-system-ch2
+            # Navigate to project directory (make sure this directory exists)
+            cd /path/to/your/project
 
-            #pull update on main
+            # Pull updates from main branch
             git pull origin main
 
-            #install depedencies 
+            # Install dependencies 
             npm install
 
-            #generate prisma client
+            # Generate Prisma client
             npx prisma generate
 
-            #restart application with pm2 
+            # Restart application with pm2
             pm2 restart "my-app" || pm2 start app.js --name "my-app"
 
-            #save configuration process PM2
-            
+            # Save PM2 process list for reboot
+            pm2 save
           EOF
