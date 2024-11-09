@@ -13,37 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Set up SSH for secure access to EC2
+      # Step 2: Set up ssh
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      # Step 3: Deploy to EC2
+
+      # Step 4: Deploy to EC2
       - name: Deploy to EC2
-        run: |
+        run: |  
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << EOF
-            # Ensure the project directory exists or clone the repository if not present
-            if [ ! -d "/home/ubuntu/F-BEE24001186-km7-azi-banking-system-ch2" ]; then
-              git clone https://github.com/AziSudarya1/F-BEE24001186-km7-azi-banking-system-ch2.git /home/ubuntu/F-BEE24001186-km7-azi-banking-system-ch2
-            fi
-
-            # Navigate to the project directory
-            cd /home/ubuntu/F-BEE24001186-km7-azi-banking-system-ch2
-
-            # Ensure we're on the correct branch and update repository
-            git checkout main
-            git reset --hard origin/main
-
-            # Install dependencies and generate Prisma client
-            npm install
-            npx prisma generate
-
-            # Restart the application using PM2 or start it if not running
-            pm2 restart my-app || pm2 start app.js --name my-app
-
-            # Save PM2 process list and set up PM2 startup script
-            pm2 save
-            pm2 startup systemd --hp /home/ubuntu
-            pm2 save
+          source ~/.nvm/nvm.sh
+          cd F-BEE24001186-km7-azi-banking-system-ch2
+          git pull origin main
+          npm install
+          npx prisma generate
+          pm2 restart my-app || pm2 start app.js --name my-app
+          pm2 save
           EOF
