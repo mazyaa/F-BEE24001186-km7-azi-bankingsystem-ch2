@@ -20,7 +20,7 @@ jobs:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
       # Step 3: Deploy to EC2
-      - name: Deploy to EC2
+      - name: Deploy to EC2.
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << EOF
             # Debugging: Print current directory
