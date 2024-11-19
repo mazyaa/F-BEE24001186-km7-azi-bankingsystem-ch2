@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notification</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f9f9f9;
+    }
+    #notification-container {
+      text-align: center;
+    }
+    #notification-container h1 {
+      color: #333;
+      font-size: 2rem;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="notification-container">
+    <h1>Realtime Notification</h1>
+  </div>
+
+  <script>
+    const socket = io();
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server!');
+    });
+
+    socket.on('notification', (message) => {
+      console.log('Notification received:', message);
+      const container = document.getElementById('notification-container');
+      const newNotification = document.createElement('h1');
+      newNotification.textContent = message;
+      container.appendChild(newNotification);
+    });
+  </script>
+</body>
+</html>
