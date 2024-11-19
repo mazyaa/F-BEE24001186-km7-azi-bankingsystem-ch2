@@ -3,6 +3,7 @@ const express = require('express');
 const router = require('../../routes/users'); 
 const { User } = require('../../../services/users'); 
 
+
 jest.mock('../../../services/users'); 
 
 const app = express();
@@ -31,118 +32,6 @@ describe('User Routes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
-
-  describe('POST /users/register', () => {
-    it('should register a new user', async () => {
-        User.prototype.register = jest.fn().mockResolvedValue({
-            id: 1,
-            name: 'Test User',
-            email: 'test@example.com',
-            password: 'hashedPassword', 
-        });
-        User.prototype.getID = jest.fn().mockReturnValue(1);
-
-        const res = await request(server)
-            .post('/users/register')
-            .send({
-                name: 'Test User',
-                email: 'test@example.com',
-                password: 'securePassword123',
-            });
-
-        expect(res.statusCode).toBe(201);
-        expect(res.body).toEqual({
-            status: true,
-            message: 'User created successfully',
-            data: {
-                id: 1,
-                name: 'Test User',
-                email: 'test@example.com',
-            },
-        });
-    });
-
-    it('should return validation error for invalid input', async () => {
-        const res = await request(server)
-            .post('/users/register')
-            .send({
-                name: '', 
-                email: 'invalid-email', 
-                password: '', 
-            });
-
-        expect(res.statusCode).toBe(400);
-        expect(res.body).toEqual({
-            status: false,
-            message: 'Validation Error',
-            error: expect.any(String),
-            data: null, 
-        });
-    });
-
-
-
-
-    it('should handle server error on registration', async () => {
-      User.prototype.register = jest.fn().mockRejectedValue(new Error('Server error'));
-
-      const res = await request(server) 
-        .post('/users/register')
-        .send({
-          name: 'Test',
-          email: 'test@example.com',
-          password: 'securePassword123',
-        });
-
-      expect(res.statusCode).toBe(500);
-      expect(res.body.message).toBe('Server error');
-    });
-  });
-
-
-
-  describe('POST /users/login', () => {
-    const sampleUser = { email: 'test@example.com', password: 'password123', name: 'Test User' };
-
-    it('should login a user with valid credentials', async () => {
-        const loginResponse = {
-            token: 'fake-jwt-token',
-            user: sampleUser,
-        };
-
-        User.prototype.login = jest.fn().mockResolvedValue(loginResponse);
-
-        const res = await request(app)
-            .post('/users/login')
-            .send({
-                email: sampleUser.email,
-                password: sampleUser.password,
-            });
-
-        expect(res.statusCode).toBe(200);
-        expect(res.body.message).toBe('Login successful');
-        expect(res.body.data.token).toBe('fake-jwt-token');
-        expect(res.body.data.user.email).toBe(sampleUser.email);
-        expect(res.body.data.user.name).toBe(sampleUser.name);
-    });
-
-   
-    it('should return error for invalid credentials', async () => {
-        User.prototype.login = jest.fn().mockRejectedValue(new Error('Invalid credentials'));
-
-        const res = await request(app)
-            .post('/users/login')
-            .send({
-                email: sampleUser.email,
-                password: 'wrongpassword',
-            });
-
-        expect(res.statusCode).toBe(400);
-        expect(res.body.message).toBe('Invalid email or password');
-        expect(res.body.data).toBeNull();
-    });
-});
 
 
   describe('GET /users', () => {

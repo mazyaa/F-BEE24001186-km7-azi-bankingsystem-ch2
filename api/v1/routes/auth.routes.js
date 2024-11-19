@@ -1,10 +1,9 @@
 const joi = require('joi');
 const router = require('express').Router();
 const { User } = require('../../services/users');
+const PasswordService = require('../../services/password.services')
 
-
-
-//regist
+// Register
 const registerSchema = joi.object({
     name: joi.string().required(),
     email: joi.string().email().required(),
@@ -23,11 +22,9 @@ router.post('/register', async (req, res, next) => {
             });
         }
 
-    
         const user = new User(value.name, value.email, value.password);
         const createdUser = await user.register();
 
-   
         res.status(201).json({
             status: true,
             message: 'User is created and has been sent a notification!',
@@ -49,9 +46,7 @@ router.post('/register', async (req, res, next) => {
     }
 });
 
-
-
-//login
+// Login
 const loginSchema = joi.object({
     email: joi.string().email().required(),
     password: joi.string().min(5).required(),
@@ -93,38 +88,35 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-//for forgot password
+// Forgot Password
 router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     try {
-      const response = await User.forgotPw(email);
-
-      res.status(200).json(response);
-      
+        const response = await PasswordService.forgotPw(email);
+        res.status(200).json(response);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
-  });
-  
-  // Router untuk reset password
-  router.post('/reset-password', async (req, res) => {
+});
+
+// Reset Password
+router.post('/reset-password', async (req, res) => {
     try {
-      const { token, newPassword } = req.body;
+        const { token, newPassword } = req.body;
 
-      if (!token || !newPassword) {
-        return res.status(400).json({ error: 'Token and newPassword are required' });
-    }
+        if (!token || !newPassword) {
+            return res.status(400).json({ error: 'Token and newPassword are required' });
+        }
 
-      const response = await User.resetPw(token, newPassword);
-  
-      res.status(200).json({ message : 'reset Password Successfully!'});
+        const response = await PasswordService.resetPw(token, newPassword);
 
-      return response;
+        res.status(200).json({
+            message: 'Password reset successfully!',
+        });
+
     } catch (error) {
-      res.status(400).json({ error: error.message });
+        res.status(400).json({ error: error.message });
     }
-  });
+});
 
-
-
-  module.exports = router;
+module.exports = router;
