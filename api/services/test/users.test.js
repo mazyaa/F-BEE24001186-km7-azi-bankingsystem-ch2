@@ -25,6 +25,14 @@ jest.mock('@prisma/client', () => {
 const mockPrisma = new PrismaClient();
 User.prototype.prisma = mockPrisma;
 
+
+beforeAll(() => {
+    // eslint-disable-next-line no-undef
+    global.io = {
+        emit: jest.fn(),
+    };
+});
+
 describe('User Service', () => {
     describe('register', () => {
         test('should register a new user', async () => {
@@ -43,6 +51,8 @@ describe('User Service', () => {
                 data: { name: newUser.name, email: newUser.email, password: 'hashedPassword' },
             });
             expect(createdUser).toEqual({ id: 1, ...newUser, password: 'hashedPassword' });
+            // eslint-disable-next-line no-undef
+            expect(global.io.emit).toHaveBeenCalledWith('notification', `Halo ${newUser.name}!, Welcome!`);
         });
     
         test('should throw an error if user already exists', async () => {
@@ -66,7 +76,6 @@ describe('User Service', () => {
             expect(bcrypt.hash).toHaveBeenCalledWith(newUser.password, 10);
         });
     });
-    
 
     describe('login', () => {
         test('should login a user and return a token', async () => {
