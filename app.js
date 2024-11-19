@@ -1,7 +1,4 @@
-
-require('./instrument');
-const sentry = require('@sentry/node');
-
+require('dotenv').config();
 const http = require('http');
 const socketIo = require('socket.io');
 const express = require('express');
@@ -11,7 +8,8 @@ const swaggerDocs = require('./swagger.json');
 const mediaRouter = require('./api/v1/routes/media.routes');
 const path = require('path');
 const cors = require('cors');
-require('dotenv').config();
+const Sentry = require('@sentry/node');
+const sentry = require('./instrument'); 
 
 const appUrl = process.env.APP_URL;
 const nodeEnv = process.env.NODE_ENV;
@@ -31,7 +29,7 @@ global.io = io;
 
 // Middleware
 app.use(cors({
-  origin: 'http://ec2-54-252-241-128.ap-southeast-2.compute.amazonaws.com/api-docs/'
+  origin: process.env.ALLOWED_ORIGIN || 'http://localhost:3000', 
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -48,8 +46,7 @@ app.get('/', (req, res) => {
   res.render('welcome');
 });
 
-
-app.get('/notification', (req, res) =>{
+app.get('/notification', (req, res) => {
   res.render('notification');
 });
 
@@ -61,7 +58,7 @@ app.use('/api/v1', mediaRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Sentry error handling
-sentry.setupExpressErrorHandler(app);
+app.use(Sentry.Handlers.errorHandler()); // Ensure Sentry is set up correctly
 
 // Error handling
 app.use((err, req, res, next) => {
