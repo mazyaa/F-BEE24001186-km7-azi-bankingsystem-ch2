@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hi <%= name %>! please reset Your Password!</h1>
+  <p>If you have forgotten your password, you can reset it here.</p>
+
+  <form action="<%= resetUrl %>" method="POST">
+    <button type="submit" class="btn">Reset Password</button>
+  </form>
+
+  <p>Click the button above to receive a password reset link in your email.</p>
+</body>
+</html>

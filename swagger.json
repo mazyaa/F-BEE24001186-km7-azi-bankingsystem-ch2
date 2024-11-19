@@ -223,170 +223,324 @@
         }
       }
     },
-    "/api/v1/auth/register": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Register a new user",
-        "description": "Registers a new user with name, email, and password",
-        "operationId": "registerUser",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "Register",
-            "description": "User object to create",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "Mazya"
-                },
-                "email": {
-                  "type": "string",
-                  "example": "Mazya12@gmail.com"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "mazya1234"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User successfully created",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "example": 1
-                },
-                "name": {
-                  "type": "string",
-                  "example": "Mazya"
-                },
-                "email": {
-                  "type": "string",
-                  "example": "Mazya12@gmail.com"
-                }
-              }
+   "/api/v1/auth/register": {
+  "post": {
+    "tags": [
+      "Auth"
+    ],
+    "summary": "Register a new user",
+    "description": "Registers a new user with name, email, and password",
+    "operationId": "registerUser",
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "parameters": [
+      {
+        "in": "body",
+        "name": "Register",
+        "description": "User object to create",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Mazya"
+            },
+            "email": {
+              "type": "string",
+              "example": "Mazya12@gmail.com"
+            },
+            "password": {
+              "type": "string",
+              "example": "mazya1234"
             }
           }
         }
       }
-    },
-    "/api/v1/auth/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Login a user",
-        "description": "Authenticates a user with email and password",
-        "operationId": "loginUser",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "Login",
-            "description": "User object to login",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "type": "string",
-                  "example": "johndoe@example.com"
-                },
-                "password": {
-                  "type": "string",
-                  "example": "JohnDoe123"
-                }
-              }
+    ],
+    "responses": {
+      "201": {
+        "description": "User successfully created",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "example": 1
+            },
+            "name": {
+              "type": "string",
+              "example": "Mazya"
+            },
+            "email": {
+              "type": "string",
+              "example": "Mazya12@gmail.com"
             }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "Login successful",
-            "schema": {
+        }
+      },
+      "400": {
+        "description": "Validation Error",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "boolean",
+              "example": false
+            },
+            "message": {
+              "type": "string",
+              "example": "Validation Error"
+            },
+            "error": {
+              "type": "string",
+              "example": "Password must be at least 5 characters"
+            },
+            "data": {
+              "type": "null",
+              "example": null
+            }
+          }
+        }
+      }
+    }
+  }
+},
+"/api/v1/auth/login": {
+  "post": {
+    "tags": [
+      "Auth"
+    ],
+    "summary": "Login a user",
+    "description": "Authenticates a user with email and password",
+    "operationId": "loginUser",
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "parameters": [
+      {
+        "in": "body",
+        "name": "Login",
+        "description": "User object to login",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "example": "johndoe@example.com"
+            },
+            "password": {
+              "type": "string",
+              "example": "JohnDoe123"
+            }
+          }
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Login successful",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "boolean",
+              "example": true
+            },
+            "message": {
+              "type": "string",
+              "example": "Login successful"
+            },
+            "data": {
               "type": "object",
               "properties": {
-                "status": {
-                  "type": "boolean",
-                  "example": true
-                },
-                "message": {
+                "token": {
                   "type": "string",
-                  "example": "Login successful"
+                  "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 },
-                "data": {
+                "user": {
                   "type": "object",
                   "properties": {
-                    "token": {
+                    "name": {
                       "type": "string",
-                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      "example": "John Doe"
                     },
-                    "user": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string",
-                          "example": "John Doe"
-                        },
-                        "email": {
-                          "type": "string",
-                          "example": "johndoe@example.com"
-                        }
-                      }
+                    "email": {
+                      "type": "string",
+                      "example": "johndoe@example.com"
                     }
                   }
                 }
               }
             }
-          },
-          "400": {
-            "description": "Validation or Authentication Error",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "status": {
-                  "type": "boolean",
-                  "example": false
-                },
-                "message": {
-                  "type": "string",
-                  "example": "Validation Error or Invalid credentials"
-                },
-                "error": {
-                  "type": "string",
-                  "example": "must be a valid email"
-                },
-                "data": {
-                  "type": "null",
-                  "example": null
-                }
-              }
+          }
+        }
+      },
+      "400": {
+        "description": "Validation or Authentication Error",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "boolean",
+              "example": false
+            },
+            "message": {
+              "type": "string",
+              "example": "Validation Error or Invalid credentials"
+            },
+            "error": {
+              "type": "string",
+              "example": "must be a valid email"
+            },
+            "data": {
+              "type": "null",
+              "example": null
             }
           }
         }
       }
-    },
+    }
+  }
+},
+"/api/v1/auth/forgot-password": {
+  "post": {
+    "tags": [
+      "Auth"
+    ],
+    "summary": "Request password reset",
+    "description": "Sends a password reset link to the user’s email",
+    "operationId": "forgotPassword",
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "parameters": [
+      {
+        "in": "body",
+        "name": "ForgotPassword",
+        "description": "Email to send reset link",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "example": "johndoe@example.com"
+            }
+          }
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Password reset link sent",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Password reset link has been sent to your email."
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Invalid Email",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "boolean",
+              "example": false
+            },
+            "message": {
+              "type": "string",
+              "example": "Invalid email address"
+            }
+          }
+        }
+      }
+    }
+  }
+},
+"/api/v1/auth/reset-password": {
+  "post": {
+    "tags": [
+      "Auth"
+    ],
+    "summary": "Reset user’s password",
+    "description": "Resets a user’s password using a valid token and new password",
+    "operationId": "resetPassword",
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "parameters": [
+      {
+        "in": "body",
+        "name": "ResetPassword",
+        "description": "Token and new password to reset",
+        "required": true,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string",
+              "example": "abc123xyz"
+            },
+            "newPassword": {
+              "type": "string",
+              "example": "NewPassword123"
+            }
+          }
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Password successfully reset",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Password has been reset successfully."
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Invalid or missing token",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "boolean",
+              "example": false
+            },
+            "message": {
+              "type": "string",
+              "example": "Invalid or missing token"
+            }
+          }
+        }
+      }
+    }
+  }
+},
     "/api/v1/accounts": {
       "post": {
         "tags": [
