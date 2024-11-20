@@ -1,3 +1,5 @@
+require("./instrument.js");
+const Sentry = require("@sentry/node");
 require('dotenv').config();
 const http = require('http');
 const socketIo = require('socket.io');
@@ -8,8 +10,7 @@ const swaggerDocs = require('./swagger.json');
 const mediaRouter = require('./api/v1/routes/media.routes');
 const path = require('path');
 const cors = require('cors');
-const Sentry = require('@sentry/node');
-const sentry = require('./instrument'); 
+
 
 const appUrl = process.env.APP_URL;
 const nodeEnv = process.env.NODE_ENV;
@@ -57,10 +58,9 @@ app.use('/api/v1/transactions', require('./api/v1/routes/transactions'));
 app.use('/api/v1', mediaRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Sentry error handling
-app.use(Sentry.Handlers.errorHandler()); // Ensure Sentry is set up correctly
 
-// Error handling
+
+// Error handling 
 app.use((err, req, res, next) => {
   console.error(err.stack);
   if (err.isJoi) {
@@ -69,9 +69,19 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ message: 'Internal server error' });
 });
 
-// Test error for Sentry
-app.get('/debug-sentry', (req, res) => {
-  throw new Error('My first Sentry error!');
+// The error handler must be registered before any other error middleware and after all controllers
+Sentry.setupExpressErrorHandler(app);
+
+// Optional fallthrough error handler
+app.use(function onError(err, req, res, next) {
+  // The error id is attached to `res.sentry` to be returned
+  // and optionally displayed to the user for support.
+  res.statusCode = 500;
+  res.end(res.sentry + "\n");
+});
+
+app.get("/debug-sentry", function mainHandler(req, res) {
+  throw new Error("My first Sentry error!");
 });
 
 // Server start

@@ -1,35 +1,26 @@
-const Sentry = require('@sentry/node');
-const { nodeProfilingIntegration } = require('@sentry/profiling-node');
+// Import with `import * as Sentry from "@sentry/node"` if you are using ESM
+const Sentry = require("@sentry/node");
+const { nodeProfilingIntegration } = require("@sentry/profiling-node");
 
-// Inisialisasi Sentry
 Sentry.init({
-    dsn: process.env.SENTRY_DSN, // Gunakan variabel lingkungan untuk DSN
-    integrations: [
-        nodeProfilingIntegration(),
-    ],
-    // Tracing - setel tingkat sampling transaksi (capture 100% transaksi)
-    tracesSampleRate: 1.0,
+  dsn: process.env.SENTRY_DSN,
+  integrations: [
+    nodeProfilingIntegration(),
+  ],
+  // Tracing
+  tracesSampleRate: 1.0, //  Capture 100% of the transactions
+});
+// Manually call startProfiler and stopProfiler
+// to profile the code in between
+Sentry.profiler.startProfiler();
+
+// Starts a transaction that will also be profiled
+Sentry.startSpan({
+  name: "My First Transaction",
+}, () => {
+  // the code executing inside the transaction will be wrapped in a span and profiled
 });
 
-// Fungsi untuk memulai dan menghentikan profiling pada bagian kode yang relevan
-function profileCriticalSection() {
-    Sentry.profiler.startProfiler(); // Memulai profiling
-    try {
-        // Kode yang ingin diprofiling
-        console.log("Profiling critical section...");
-        // Simulasikan proses yang memakan waktu
-        for (let i = 0; i < 1000000; i++) {
-            // Proses berat
-        }
-    } catch (error) {
-        console.error("Error in critical section: ", error);
-    } finally {
-        // Hentikan profiling setelah bagian kode selesai
-        Sentry.profiler.stopProfiler(); // Memastikan profiling dihentikan
-    }
-}
-
-// Panggil fungsi profiling hanya di tempat yang dibutuhkan
-profileCriticalSection();
-
-// Jika perlu, Anda dapat menambahkan logika tambahan untuk memulai dan menghentikan profiler berdasarkan event atau kondisi tertentu
+// Calls to stopProfiling are optional - if you don't stop the profiler, it will keep profiling
+// your application until the process exits or stopProfiling is called.
+Sentry.profiler.stopProfiler();
