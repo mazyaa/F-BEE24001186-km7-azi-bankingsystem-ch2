@@ -14,6 +14,7 @@
   },
   "host": "localhost:3000",
   "basePath": "/",
+  "schemes": ["http"], 
   "securityDefinitions": {
     "Bearer": {
       "type": "apiKey",
