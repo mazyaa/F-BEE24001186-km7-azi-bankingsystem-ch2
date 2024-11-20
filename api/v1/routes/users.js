@@ -1,7 +1,7 @@
-const joi = require('joi');
 const router = require('express').Router();
 const { User } = require('../../services/users');
 
+<<<<<<< HEAD
 //regist
 const registerSchema = joi.object({
     name: joi.string().min(3).required(),
@@ -88,6 +88,8 @@ router.post('/login', async (req, res) => {
     }
 });
 
+=======
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
 
 // GET all data ftom table User
 router.get('/', async (req, res, next) =>{
@@ -95,6 +97,10 @@ router.get('/', async (req, res, next) =>{
         const users = await User.getAllData();  
         res.status(200).json(users);
     } catch(error){
+<<<<<<< HEAD
+=======
+        next(error);
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
         res.status(500).json({
             message: 'Server error'
         });
@@ -104,13 +110,17 @@ router.get('/', async (req, res, next) =>{
 // GET data User by id
 router.get('/:userId', async (req, res, next) =>{
     try{
-        const userId = parseInt(req.params.userId, 10)
+        const userId = parseInt(req.params.userId, 10);
         const user = await User.getById(userId);
         if(!user){
-            return res.status(404).json({ message: 'User not found!!!'})
+            return res.status(404).json({ message: 'User not found!!!'});
         }
-        res.status(202).json(user)
+        res.status(202).json(user);
     } catch (error){
+<<<<<<< HEAD
+=======
+        next(error);
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
         res.status(500).json({
             message: 'Server error'
         });
@@ -133,6 +143,10 @@ router.put('/:userId', async(req, res, next) =>{
         });
 
     } catch (error){
+<<<<<<< HEAD
+=======
+        next(error);
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
         res.status(500).json({
             message: 'Server error'
         });
@@ -155,6 +169,10 @@ router.delete('/:userId', async (req, res, next) =>{
                 message: error.message
             });
         } else {
+<<<<<<< HEAD
+=======
+            next(error);
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             res.status(500).json({
                 message: 'Server error'
             });

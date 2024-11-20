@@ -107,41 +107,25 @@ describe('Transaction Service', () => {
     });
 
     describe('getById', () => {
-        describe('getById', () => {
-            test('should retrieve transaction by ID', async () => {
-                const mockTransaction = {
-                    id: 1,
-                    amount: 100,
-                    sourceAccountId: 1,
-                    destinationAccountId: 2,
-                    sourceAccount: { id: 1, balance: 200 },
-                    destinationAccount: { id: 2, balance: 300 },
-                };
-        
-                prisma.transaction.findUnique = jest.fn().mockResolvedValue(mockTransaction);
-        
-                const transaction = await Transaction.getById(1);
-        
-                expect(transaction).toEqual(mockTransaction);
-                expect(prisma.transaction.findUnique).toHaveBeenCalledWith({
-                    where: { id: 1 },
-                    include: { sourceAccount: true, destinationAccount: true },
-                });
+        test('should retrieve transaction by ID', async () => {
+            const mockTransaction = {
+                id: 1,
+                amount: 100,
+                sourceAccountId: 1,
+                destinationAccountId: 2,
+                sourceAccount: { id: 1, balance: 200 },
+                destinationAccount: { id: 2, balance: 300 },
+            };
+
+            prisma.transaction.findUnique.mockResolvedValue(mockTransaction);
+
+            const transaction = await Transaction.getById(1);
+
+            expect(transaction).toEqual(mockTransaction);
+            expect(prisma.transaction.findUnique).toHaveBeenCalledWith({
+                where: { id: 1 },
+                include: { sourceAccount: true, destinationAccount: true },
             });
-<<<<<<< HEAD
         });
-=======
-        
-            test('should throw an error if transaction not found', async () => {
-                prisma.transaction.findUnique = jest.fn().mockResolvedValue(null);
-        
-                await expect(Transaction.getById(999)).rejects.toThrow('Transaction not found');
-                expect(prisma.transaction.findUnique).toHaveBeenCalledWith({
-                    where: { id: 999 },
-                    include: { sourceAccount: true, destinationAccount: true },
-                });
-            });
-        });   
->>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
     });
 });

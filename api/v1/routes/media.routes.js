@@ -8,7 +8,12 @@ const {
     getAll,
     getById,
     putMedia,
+<<<<<<< HEAD
     deleteMedia
+=======
+    deleteMedia,
+
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
 } = require('../../../controllers/media.controllers');
 
 

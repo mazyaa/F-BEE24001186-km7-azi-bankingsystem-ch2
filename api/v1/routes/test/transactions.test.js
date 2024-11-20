@@ -94,23 +94,24 @@ describe('Transactions API', () => {
     describe('GET /:transactionId', () => {
         test('should return a transaction by id', async () => {
             const transaction = { id: 1, sourceAccountId: 1, destinationAccountId: 2, amount: 1000 };
-
-            Transaction.getById.mockResolvedValue(transaction);
-
+            Transaction.getById = jest.fn().mockResolvedValue(transaction); // Define the mock function
+    
             const response = await request(app).get('/api/transactions/1');
-
+    
             expect(response.status).toBe(200);
             expect(response.body).toEqual(transaction);
+            expect(Transaction.getById).toHaveBeenCalledWith(1); // Check that getById is called with the correct ID
         });
-
+    
         test('should return 404 if transaction not found', async () => {
-            Transaction.getById.mockResolvedValue(null);
-
+            Transaction.getById = jest.fn().mockResolvedValue(null); // Mock return value as null for not found
+    
             const response = await request(app).get('/api/transactions/999');
-
+    
             expect(response.status).toBe(404);
-            expect(response.body.message).toBe('Transaction not found');
+            expect(response.body).toEqual({ message: 'Transaction not found' });
         });
+<<<<<<< HEAD
 
         test('should handle internal server error when fetching transaction by id', async () => {
             Transaction.getById.mockRejectedValue(new Error('Internal server error'));
@@ -122,3 +123,16 @@ describe('Transactions API', () => {
         });
     });
 });
+=======
+    
+        test('should handle internal server error when fetching transaction by id', async () => {
+            Transaction.getById = jest.fn().mockRejectedValue(new Error('Internal server error')); // Mock to throw an error
+    
+            const response = await request(app).get('/api/transactions/1');
+    
+            expect(response.status).toBe(500);
+            expect(response.body).toEqual({ message: 'Internal server error' });
+        });
+    });    
+});
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
