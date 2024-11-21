@@ -29,9 +29,7 @@ io.on('connection', (socket) => {
 global.io = io;
 
 // Middleware
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGIN || 'http://localhost:3000', 
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
@@ -85,7 +83,7 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 });
 
 // Server start
-server.listen(port, () => {
+server.listen(port, '0.0.0.0', () => {
   console.log(`Server running on ${appUrl} in ${nodeEnv} mode`);
   console.log(`API docs available at http://${appUrl}/api-docs`);
 });

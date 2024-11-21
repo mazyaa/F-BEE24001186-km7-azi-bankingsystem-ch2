@@ -87,6 +87,10 @@ class PasswordService {
 
       await transporter.sendMail(mailOptions);
 
+      // eslint-disable-next-line no-undef
+      global.io.emit('notification', `Halo ${user.name}!, Reset password berhasil!`);
+      console.log('Notification sent:', user.name);
+
       return { message: `${user.name}, password Anda berhasil di-reset!` };
 
     } catch (error) {
