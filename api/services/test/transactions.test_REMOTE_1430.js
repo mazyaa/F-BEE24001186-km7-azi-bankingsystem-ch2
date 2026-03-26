@@ -128,9 +128,6 @@ describe('Transaction Service', () => {
                     include: { sourceAccount: true, destinationAccount: true },
                 });
             });
-<<<<<<< HEAD
-        });
-=======
         
             test('should throw an error if transaction not found', async () => {
                 prisma.transaction.findUnique = jest.fn().mockResolvedValue(null);
@@ -142,6 +139,5 @@ describe('Transaction Service', () => {
                 });
             });
         });   
->>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
     });
 });

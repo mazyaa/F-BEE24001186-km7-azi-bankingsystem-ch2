@@ -98,11 +98,19 @@ class User {
       updatedData.password = await bcrypt.hash(data.password, 10);
     }
 
+<<<<<<< HEAD
+    static async updateUser(userId, data){
+        return await prisma.user.update({
+            where: {
+                id : userId,
+            },  
+=======
     return await prisma.user.update({
       where: { id: userId },
       data: updatedData,
     });
   }
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
 
   static async deleteUser(userId) {
     const user = await prisma.user.findUnique({
@@ -122,6 +130,11 @@ class User {
       },
     });
 
+<<<<<<< HEAD
+        if (!user) {
+            throw new Error(`User not found`);
+        }
+=======
     // baru delete usernya
     return await prisma.user.delete({
       where: {
@@ -129,6 +142,7 @@ class User {
       },
     });
   }
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
 
   async getPassword() {
     const encryptedPassword = await bcrypt.hash(this.password, 10);

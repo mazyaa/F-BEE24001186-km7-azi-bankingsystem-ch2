@@ -37,11 +37,19 @@ describe('User Service', () => {
     describe('register', () => {
         test('should register a new user', async () => {
             const newUser = { name: 'Test User', email: 'testuser@example.com', password: 'password123' };
+<<<<<<< HEAD
+
+            bcrypt.hash.mockResolvedValue('hashedPassword');
+            mockPrisma.user.findUnique.mockResolvedValue(null); // Simulate no existing user
+            mockPrisma.user.create.mockResolvedValue({ id: 1, ...newUser, password: 'hashedPassword' });
+
+=======
     
             bcrypt.hash = jest.fn().mockResolvedValue('hashedPassword');
             mockPrisma.user.findUnique = jest.fn().mockResolvedValue(null); // Simulate no existing user
             mockPrisma.user.create = jest.fn().mockResolvedValue({ id: 1, ...newUser, password: 'hashedPassword' });
     
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             const user = new User(newUser.name, newUser.email, newUser.password);
             const createdUser = await user.register();
     
@@ -74,6 +82,24 @@ describe('User Service', () => {
             const user = new User(newUser.name, newUser.email, newUser.password);
             await expect(user.register()).rejects.toThrow('Hashing error');
             expect(bcrypt.hash).toHaveBeenCalledWith(newUser.password, 10);
+        });
+
+        test('should throw an error if user already exists', async () => {
+            const existingUser = { id: 1, name: 'Test User', email: 'testuser@example.com', password: 'hashedPassword' };
+            mockPrisma.user.findUnique.mockResolvedValue(existingUser); // Simulate existing user
+
+            const user = new User(existingUser.name, existingUser.email, 'password123');
+            await expect(user.register()).rejects.toThrow('User already exists');
+        });
+
+        test('should throw an error if hashing password fails', async () => {
+            const newUser = { name: 'Test User', email: 'testuser@example.com', password: 'password123' };
+
+            bcrypt.hash.mockRejectedValue(new Error('Hashing error'));
+            mockPrisma.user.findUnique.mockResolvedValue(null); // Simulate no existing user
+
+            const user = new User(newUser.name, newUser.email, newUser.password);
+            await expect(user.register()).rejects.toThrow('Hashing error');
         });
     });
 
@@ -139,6 +165,39 @@ describe('User Service', () => {
 
             await expect(User.getAllData()).rejects.toThrow('Internal server error');
         });
+<<<<<<< HEAD
+    });
+    
+
+    describe('updateUser', () => {
+        test('should update a user successfully', async () => {
+            const userId = 1;
+            const updateData = { name: 'Updated User', email: 'updated@example.com', password: 'newPassword' };
+
+            mockPrisma.user.findUnique.mockResolvedValue({ id: userId, ...updateData });
+            bcrypt.hash.mockResolvedValue('hashedNewPassword');
+            mockPrisma.user.update.mockResolvedValue({ ...updateData, password: 'hashedNewPassword' });
+
+            const updatedUser = await User.updateUser(userId, updateData);
+
+            expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({ where: { id: userId } });
+            expect(mockPrisma.user.update).toHaveBeenCalledWith({
+                where: { id: userId },
+                data: { name: updateData.name, email: updateData.email, password: 'hashedNewPassword' },
+            });
+            expect(updatedUser).toEqual({ ...updateData, password: 'hashedNewPassword' });
+        });
+
+        test('should throw an error if user does not exist', async () => {
+            const userId = 1;
+            const updateData = { name: 'Updated User', email: 'updated@example.com', password: 'newPassword' };
+
+            mockPrisma.user.findUnique.mockResolvedValue(null); 
+
+            await expect(User.updateUser(userId, updateData)).rejects.toThrow('User not found');
+        });
+=======
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
     });
     
 

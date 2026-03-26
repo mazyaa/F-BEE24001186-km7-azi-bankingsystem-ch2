@@ -22,10 +22,15 @@ describe('Accounts API', () => {
     describe('POST /', () => {
         test('should create a new account and return it', async () => {
             const newAccount = { bankName: 'Bank A', bankAccountNumber: '123456789', balance: 1000, userId: 1 };
+<<<<<<< HEAD
+            Account.createAccount.mockResolvedValue(newAccount);
+            const response = await request(app).post('/api/accounts').send(newAccount);
+=======
             Account.createAccount = jest.fn().mockResolvedValue(newAccount);
     
             const response = await request(app).post('/api/accounts').send(newAccount);
     
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(201);
             expect(response.body).toEqual(newAccount);
         });
@@ -55,17 +60,37 @@ describe('Accounts API', () => {
         });
     
         test('should handle internal server error on account creation', async () => {
+<<<<<<< HEAD
+            Account.createAccount.mockRejectedValue(new Error('Internal server error'));
+            const response = await request(app).post('/api/accounts').send({ bankName: 'Bank A', bankAccountNumber: '123456789', balance: 1000, userId: 1 });
+=======
             Account.createAccount = jest.fn().mockRejectedValue(new Error('Internal server error'));
     
             const response = await request(app).post('/api/accounts').send({
                 bankName: 'Bank A', bankAccountNumber: '123456789', balance: 1000, userId: 1
             });
     
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(500);
             expect(response.body.message).toBe('Internal server error');
         });
     });
     
+<<<<<<< HEAD
+
+    describe('GET /', () => {
+        test('should return all accounts', async () => {
+            const accounts = [{ id: 1, bankName: 'Bank A', balance: 1000 }];
+            Account.getAllAccounts.mockResolvedValue(accounts);
+            const response = await request(app).get('/api/accounts');
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(accounts);
+        });
+
+        test('should handle server error when fetching accounts', async () => {
+            Account.getAllAccounts.mockRejectedValue(new Error('Internal server error'));
+            const response = await request(app).get('/api/accounts');
+=======
     describe('GET /', () => {
         test('should return all accounts', async () => {
             const accounts = [{ id: 1, bankName: 'Bank A', balance: 1000 }];
@@ -82,6 +107,7 @@ describe('Accounts API', () => {
     
             const response = await request(app).get('/api/accounts');
             
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(500);
             expect(response.body.message).toBe('Internal server error');
         });
@@ -90,15 +116,31 @@ describe('Accounts API', () => {
     describe('GET /:id', () => {
         test('should return an account by id', async () => {
             const account = { id: 1, bankName: 'Bank A', balance: 1000 };
+<<<<<<< HEAD
+            Account.getById.mockResolvedValue(account);
+            const response = await request(app).get('/api/accounts/1');
+=======
             Account.getById = jest.fn().mockResolvedValue(account);
     
             const response = await request(app).get('/api/accounts/1');
             
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(200);
             expect(response.body).toEqual(account);
         });
     
         test('should return 404 if account not found', async () => {
+<<<<<<< HEAD
+            Account.getById.mockResolvedValue(null);
+            const response = await request(app).get('/api/accounts/999');
+            expect(response.status).toBe(404);
+            expect(response.body.message).toBe('Account not found');
+        });
+
+        test('should handle server error when fetching an account by ID', async () => {
+            Account.getById.mockRejectedValue(new Error('Internal server error'));
+            const response = await request(app).get('/api/accounts/1');
+=======
             Account.getById = jest.fn().mockResolvedValue(null);
     
             const response = await request(app).get('/api/accounts/999');
@@ -112,6 +154,7 @@ describe('Accounts API', () => {
     
             const response = await request(app).get('/api/accounts/1');
             
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(500);
             expect(response.body.message).toBe('Internal server error');
         });
@@ -121,6 +164,10 @@ describe('Accounts API', () => {
     describe('POST /:id/deposit', () => {
         test('should deposit money and return updated account', async () => {
             const updatedAccount = { id: 1, bankName: 'Bank A', balance: 2000 };
+<<<<<<< HEAD
+            Account.deposit.mockResolvedValue(updatedAccount);
+            const response = await request(app).post('/api/accounts/1/deposit').send({ balance: 1000 });
+=======
     
             
             Account.deposit = jest.fn().mockResolvedValue(updatedAccount);
@@ -130,20 +177,36 @@ describe('Accounts API', () => {
                 .post('/api/accounts/1/deposit')
                 .send({ balance: 1000 });
     
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(200);
             expect(response.body).toEqual(updatedAccount);
         });
     
         test('should return 400 if deposit balance is invalid', async () => {
+<<<<<<< HEAD
+            const response = await request(app).post('/api/accounts/1/deposit').send({ balance: -100 });
+=======
             const response = await request(app)
                 .post('/api/accounts/1/deposit')
                 .send({ balance: -100 });
             
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid deposit balance');
         });
     
         test('should return 404 if account does not exist', async () => {
+<<<<<<< HEAD
+            Account.getById.mockResolvedValue(null);
+            const response = await request(app).post('/api/accounts/999/deposit').send({ balance: 100 });
+            expect(response.status).toBe(404);
+            expect(response.body.message).toBe('Account not found');
+        });
+
+        test('should handle server error during deposit', async () => {
+            Account.deposit.mockRejectedValue(new Error('Internal server error'));
+            const response = await request(app).post('/api/accounts/1/deposit').send({ balance: 1000 });
+=======
             Account.getById = jest.fn().mockResolvedValue(null);
     
             const response = await request(app)
@@ -162,6 +225,7 @@ describe('Accounts API', () => {
                 .post('/api/accounts/1/deposit')
                 .send({ balance: 1000 });
     
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(500);
             expect(response.body.message).toBe('Internal server error');
         });
@@ -171,6 +235,10 @@ describe('Accounts API', () => {
     describe('POST /:id/withdraw', () => {
         test('should withdraw money and return updated account', async () => {
             const updatedAccount = { id: 1, bankName: 'Bank A', balance: 500 };
+<<<<<<< HEAD
+            Account.withdraw.mockResolvedValue(updatedAccount);
+            const response = await request(app).post('/api/accounts/1/withdraw').send({ balance: 500 });
+=======
     
             // Mock fungsi withdraw untuk mengembalikan updatedAccount
             Account.withdraw = jest.fn().mockResolvedValue(updatedAccount);
@@ -180,31 +248,46 @@ describe('Accounts API', () => {
                 .post('/api/accounts/1/withdraw')
                 .send({ balance: 500 });
             
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(200);
             expect(response.body).toEqual(updatedAccount);
         });
     
         test('should return 400 if withdraw balance is invalid', async () => {
+<<<<<<< HEAD
+            const response = await request(app).post('/api/accounts/1/withdraw').send({ balance: -500 });
+=======
             const response = await request(app)
                 .post('/api/accounts/1/withdraw')
                 .send({ balance: -500 });
             
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid withdraw balance');
         });
     
         test('should return 404 if account does not exist', async () => {
+<<<<<<< HEAD
+            Account.getById.mockResolvedValue(null);
+            const response = await request(app).post('/api/accounts/999/withdraw').send({ balance: 100 });
+=======
             Account.getById = jest.fn().mockResolvedValue(null);
     
             const response = await request(app)
                 .post('/api/accounts/999/withdraw')
                 .send({ balance: 100 });
             
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(404);
             expect(response.body.message).toBe('Account not found');
         });
     
         test('should return 400 if insufficient balance', async () => {
+<<<<<<< HEAD
+            Account.getById.mockResolvedValue({ id: 1, bankName: 'Bank A', balance: 500 });
+            Account.withdraw.mockRejectedValue(new Error('Insufficient balance'));
+            const response = await request(app).post('/api/accounts/1/withdraw').send({ balance: 1000 });
+=======
             // Mock fungsi getById untuk mengembalikan akun dengan saldo lebih kecil dari yang diminta
             Account.getById = jest.fn().mockResolvedValue({ id: 1, bankName: 'Bank A', balance: 500 });
             Account.withdraw = jest.fn().mockRejectedValue(new Error('Insufficient balance'));
@@ -213,6 +296,7 @@ describe('Accounts API', () => {
                 .post('/api/accounts/1/withdraw')
                 .send({ balance: 1000 });
     
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Insufficient balance');
         });

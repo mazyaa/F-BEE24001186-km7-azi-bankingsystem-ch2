@@ -111,6 +111,19 @@ describe('Transactions API', () => {
             expect(response.status).toBe(404);
             expect(response.body).toEqual({ message: 'Transaction not found' });
         });
+<<<<<<< HEAD
+
+        test('should handle internal server error when fetching transaction by id', async () => {
+            Transaction.getById.mockRejectedValue(new Error('Internal server error'));
+
+            const response = await request(app).get('/api/transactions/1');
+
+            expect(response.status).toBe(500);
+            expect(response.body.message).toBe('Internal server error');
+        });
+    });
+});
+=======
     
         test('should handle internal server error when fetching transaction by id', async () => {
             Transaction.getById = jest.fn().mockRejectedValue(new Error('Internal server error')); // Mock to throw an error
@@ -122,3 +135,4 @@ describe('Transactions API', () => {
         });
     });    
 });
+>>>>>>> ba5e30f1a21ec73d1201cf479c9f475c5559bf2e
